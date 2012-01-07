@@ -6,6 +6,8 @@ from twisted.web.server import Site
 from twisted.web.static import File
 from twisted.internet   import reactor, threads
 from httputil import HTTPHeaders
+from Components.config import config
+
 class AirplayProtocolHandler(object):
     
     def __init__(self, port, media_backend):
@@ -206,7 +208,7 @@ class PhotoHandler(BaseHandler):
 
         if request.content.read() is not None:
             request.content.seek(0)
-            file('/hdd/pic.jpg','wb').write(request.content.read())      
+            file(config.plugins.airplayer.path.value + "pic.jpg",'wb').write(request.content.read())      
             self._media_backend.show_picture(request.content.read())
         
         request.setHeader('content-length', 0)    
