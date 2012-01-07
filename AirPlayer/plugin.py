@@ -35,8 +35,8 @@ config.plugins.airplayer = ConfigSubsection()
 
 config.plugins.airplayer.startuptype  = ConfigYesNo(default = True)
 config.plugins.airplayer.interface    = ConfigSelection(default = "LAN", choices = ["LAN", "WLAN"])
-config.plugins.airplayer.name         = ConfigText(default = "Dreambox")
-config.plugins.airplayer.path         = ConfigText(default = "/hdd/")
+config.plugins.airplayer.name         = ConfigText(default = "Dreambox", fixed_size=False)
+config.plugins.airplayer.path         = ConfigText(default = "/hdd/", fixed_size=False)
 
 config.plugins.airplayer.save()
 
