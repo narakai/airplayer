@@ -14,6 +14,7 @@ from Components.ActionMap import ActionMap
 from Components.Pixmap import Pixmap
 from Components.AVSwitch import AVSwitch
 from base_media_backend import BaseMediaBackend
+from Components.config import config
 
 class E2MediaBackend(BaseMediaBackend):
 
@@ -53,7 +54,7 @@ class E2MediaBackend(BaseMediaBackend):
             self.window.start_decode()
         #    self.window.leavePlayer()
         else:
-            self.session.open(AirPlayPicturePlayer, self, "/hdd/pic.jpg")
+            self.session.open(AirPlayPicturePlayer, self, config.plugins.airplayer.path.value + "pic.jpg")
         pass
         
     def play_movie(self, url):
@@ -187,7 +188,7 @@ class AirPlayPicturePlayer(Screen):
         #self.skinName = "MoviePlayer"
 
         self.bgcolor = "#00000000"
-        space = 40
+        space = 0 #formerly 40 we will see ;-)
         size_w = getDesktop(0).size().width()
         size_h = getDesktop(0).size().height()
         
