@@ -34,8 +34,8 @@ from Screens.MessageBox import MessageBox
 config.plugins.airplayer = ConfigSubsection()
 
 config.plugins.airplayer.startuptype  = ConfigYesNo(default = True)
-config.plugins.airplayer.interface    = ConfigSelection(default = "LAN", choices = ["LAN", "WLAN"])
-config.plugins.airplayer.name         = ConfigText(default = "Dreambox", fixed_size=False)
+config.plugins.airplayer.interface    = ConfigSelection(default = "eth0", choices ={"eth0": _("LAN"), "wlan0": _("WLAN")})
+config.plugins.airplayer.name         = ConfigText(default = "AirPlayer E2", fixed_size=False)
 config.plugins.airplayer.path         = ConfigText(default = "/hdd/", fixed_size=False)
 
 config.plugins.airplayer.save()
@@ -147,10 +147,7 @@ class AP_MainMenu(Screen, ConfigListScreen):
 # Actions to take place to stop the webserver
 #===============================================================================		
 def stopWebserver(session):
-	if config.plugins.airplayer.interface.value == "LAN":
-		os.system("killall mipsel-zero_eth0 &")
-	else:
-		os.system("killall mipsel-zero_wlan0 &")
+	os.system("killall zeroconfig &")
 	print "[AirPlayer] service stopped"
 
 
@@ -174,10 +171,7 @@ def startWebserver(session):
 	print "[AirPlayer] starting webserver done"
 	print "[AirPlayer] starting zeroconf"
 	
-	if config.plugins.airplayer.interface.value == "LAN":
-		os.system("/usr/lib/enigma2/python/Plugins/Extensions/AirPlayer/mipsel-zero_eth0 " +  config.plugins.airplayer.name.value + " &")
-	else:
-		os.system("/usr/lib/enigma2/python/Plugins/Extensions/AirPlayer/mipsel-zero_wlan0 " + config.plugins.airplayer.name.value + " &")
+	os.system("/usr/lib/enigma2/python/Plugins/Extensions/AirPlayer/zeroconfig \"" +  config.plugins.airplayer.name.value + "\" " + config.plugins.airplayer.interface.value + " &")
 	
 	print "[AirPlayer] starting zeroconf done"
 	
@@ -215,5 +209,5 @@ def main(session, **kwargs):
 def Plugins(**kwargs):
 	return [PluginDescriptor(where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=sessionstart),
 			PluginDescriptor(where=[PluginDescriptor.WHERE_NETWORKCONFIG_READ], fnc=networkstart),
-			PluginDescriptor(name = "Airplayer", description = "Airplayer", where = PluginDescriptor.WHERE_PLUGINMENU, fnc=main)]
+			PluginDescriptor(name = "AirPlayer", description = "AirPlayer", where = PluginDescriptor.WHERE_PLUGINMENU, fnc=main)]
 	

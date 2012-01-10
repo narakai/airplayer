@@ -300,21 +300,27 @@ int main (int argc,char* argv[]){
 	unsigned char response[512];
 	unsigned short port = 6002;
 	char default_name[]="duck";
+	char default_device[]="eth0";
 	char* name = NULL;
+	char* device = NULL;
 	if(argc > 1){
 		name=argv[1];
 	}else{
 		name=default_name;
 	}
+	if(argc > 2){
+			device=argv[2];
+	}else{
+			device=default_device;
+	}
 
-
-	char* ip=getIP("eth0");
-	char* mac=getMAC("eth0");
+	char* ip=getIP(device);
+	char* mac=getMAC(device);
 
 	char host[128];
 	gethostname(host,128);
 
-	printf("Setting up airplay service %s for host %s IP: %s Mac: %s\n",name,host,ip,mac);
+	printf("Setting up airplay service %s for host %s IP: %s Mac: %s Device: %s\n",name,host,ip,mac,device);
 
 	int s = createSocket(ip);
 	int len_request = createRequestPacket(request,name,port,host,mac);
