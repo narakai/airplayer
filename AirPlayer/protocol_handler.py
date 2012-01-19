@@ -7,6 +7,7 @@ from twisted.web.static import File
 from twisted.internet   import reactor, threads
 from httputil import HTTPHeaders
 from Components.config import config
+from Components.Network import iNetwork
 
 class AirplayProtocolHandler(object):
     
@@ -127,7 +128,7 @@ class ScrubHandler(BaseHandler):
         """
         Will return None, None if no media is playing or an error occures.
         """
-        position, duration = self._media_backend.get_player_position()
+        position, duration, bufferPosition = self._media_backend.get_player_position()
 
         """
         Should None values be returned just default to 0 values.
@@ -259,9 +260,14 @@ class ServerInfoHandler(BaseHandler):
     
     def render_GET(self, request):
         print "[AirPlayer] ServerInfoHandler GET"
+        mac = iNetwork.getAdapterAttribute(config.plugins.airplayer.interface.value,'mac')
+        if mac is None:
+            mac = "01:02:03:04:05:06"
+        mac=mac.upper()
+        response = appletv.SERVER_INFO % (mac)
         request.setHeader('Content-Type', 'text/x-apple-plist+xml')
-        request.setHeader('content-length', len(appletv.SERVER_INFO))
-        request.write(appletv.SERVER_INFO)
+        request.setHeader('content-length', len(response))
+        request.write(response)
         request.finish()
         return 1 # NOT_DONE_YET
         
@@ -293,7 +299,7 @@ class PlaybackInfoHandler(BaseHandler):
     def render_GET(self, request):
         print "[AirPlayer] PlaybackInfoHandler GET"
         playing = self._media_backend.is_playing()
-        position, duration = self._media_backend.get_player_position()
+        position, duration, bufferPosition = self._media_backend.get_player_position()
         
         if not position:
             position = duration = 0
@@ -302,7 +308,7 @@ class PlaybackInfoHandler(BaseHandler):
             duration = float(duration)
         print "[AirPlayer] PlaybackInfoHandler pos:",position, " duration:",duration," play:",int(playing)
         
-        body = appletv.PLAYBACK_INFO % (duration, duration, position, int(playing), duration)
+        body = appletv.PLAYBACK_INFO % (duration, bufferPosition, position, int(playing), duration)
         
         request.setHeader('Content-Type', 'text/x-apple-plist+xml')
         request.setHeader('content-length', len(body))

@@ -15,6 +15,8 @@ from Components.Pixmap import Pixmap
 from Components.AVSwitch import AVSwitch
 from base_media_backend import BaseMediaBackend
 from Components.config import config
+from Components.ServiceEventTracker import ServiceEventTracker
+from enigma import iPlayableService
 
 class E2MediaBackend(BaseMediaBackend):
 
@@ -23,7 +25,36 @@ class E2MediaBackend(BaseMediaBackend):
         self.session = session
         self.sref = None
         self.window = None
-        
+        self.onClose = [ ]
+        self.bufferSeconds = 0
+        self.bufferPercent = 0
+        self.bufferSecondsLeft = 0
+        self.__event_tracker = ServiceEventTracker(screen=self,eventmap=
+            {
+                iPlayableService.evBuffering: self.__evUpdatedBufferInfo,
+                
+            })
+    def __evUpdatedBufferInfo(self):
+        bufferInfo = self.session.nav.getCurrentService().streamed().getBufferCharge()
+        if bufferInfo[2] != 0:
+            self.bufferSeconds = bufferInfo[4] / bufferInfo[2] #buffer size / avgOutRate
+        else:
+            self.bufferSeconds = 0
+        self.bufferPercent = bufferInfo[0]
+        self.bufferSecondsLeft = self.bufferSeconds * self.bufferPercent / 100
+        if(self.bufferPercent > 90):
+            if self.window is not None:
+                self.window.bufferFull()
+        if(self.bufferPercent < 3):
+            if self.window is not None:
+                self.window.bufferEmpty()
+        print "Buffer",bufferInfo[4], "Info ",bufferInfo[0], "% filled ",bufferInfo[1],"/",bufferInfo[2]," buffered: ",self.bufferSecondsLeft, "s"
+        #print "percent ",bufferInfo[0]
+        #print "avgInRate ",bufferInfo[1]
+        #print "avgOutRate ",bufferInfo[2]
+        #print "buffering left ",bufferInfo[3]
+        #print "buffer size ",bufferInfo[4]
+    
     def cleanup(self):
         """
         Called when airplayer is about to shutdown.
@@ -117,7 +148,7 @@ class E2MediaBackend(BaseMediaBackend):
             if not r[0]:
                 time = r[1] / 90000
             
-        return time, length
+        return time, length, time + self.bufferSecondsLeft
         
 
     def set_player_position(self, position):
@@ -126,7 +157,7 @@ class E2MediaBackend(BaseMediaBackend):
         @param position integer in seconds
         """
         
-        time, length = self.get_player_position()
+        time, length ,buffer = self.get_player_position()
         print '[AirPlayer] set_player_position: to:', position, " from:",time, " diff:",position - time
         if self.window is not None:
             self.window.unPauseService()
@@ -158,8 +189,20 @@ class AirPlayMoviePlayer(MoviePlayer):
         MoviePlayer.__init__(self, session, service)
         self.backend = backend
         backend.window=self
+        session.nav.getCurrentService().streamed().setBufferSize(config.plugins.airplayer.bufferSize.value)
+        self.AutoPlay = True
         #self.skinName = "MoviePlayer"
 
+    def bufferFull(self):
+        if self.AutoPlay:
+            if self.seekstate != self.SEEK_STATE_PLAY :
+                self.setSeekState(self.SEEK_STATE_PLAY)
+    
+    def bufferEmpty(self):
+        if self.AutoPlay:
+            if self.seekstate != self.SEEK_STATE_PAUSE :
+                self.setSeekState(self.SEEK_STATE_PAUSE)
+    
     def leavePlayer(self):
         self.leavePlayerConfirmed(True)
 
