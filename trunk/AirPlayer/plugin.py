@@ -26,6 +26,7 @@ from Components.config import configfile
 from Components.config import ConfigYesNo
 from Components.config import ConfigPassword
 
+from Components.Network import iNetwork
 from Screens.MessageBox import MessageBox
 
 #------------------------------------------------------------------------------------------
@@ -34,9 +35,10 @@ from Screens.MessageBox import MessageBox
 config.plugins.airplayer = ConfigSubsection()
 
 config.plugins.airplayer.startuptype  = ConfigYesNo(default = True)
-config.plugins.airplayer.interface    = ConfigSelection(default = "eth0", choices ={"eth0": _("LAN"), "wlan0": _("WLAN")})
+#config.plugins.airplayer.interface    = ConfigSelection(default = "eth0", choices ={"eth0": _("LAN"), "wlan0": _("WLAN")})
 config.plugins.airplayer.name         = ConfigText(default = "AirPlayer E2", fixed_size=False)
 config.plugins.airplayer.path         = ConfigText(default = "/hdd/", fixed_size=False)
+config.plugins.airplayer.bufferSize         = ConfigInteger(default = 8*1024*1024)
 
 config.plugins.airplayer.save()
 
@@ -46,7 +48,6 @@ config.plugins.airplayer.save()
 global_session = None
 global_protocol_handler = None
 global_media_backend = None
-
 #===============================================================================
 # class
 # AP_MainMenu
@@ -76,6 +77,7 @@ class AP_MainMenu(Screen, ConfigListScreen):
 				getConfigListEntry(_("Startup type"), config.plugins.airplayer.startuptype, _("Should the airplayer start automatically on startup?")),
 				getConfigListEntry(_("Interface"), config.plugins.airplayer.interface, _("Which interface should be used for the airport service?")),
 				getConfigListEntry(_("Service name"), config.plugins.airplayer.name, _("Which name should be used to identify the device with active airport service?")),
+				getConfigListEntry(_("Buffer Size"), config.plugins.airplayer.bufferSize, _("How much Memmory should gstreamer allocate to buffer the Stream")),
 				getConfigListEntry(_("Path"), config.plugins.airplayer.path, _("Path for the temp files.")),
 			],
 			session = session,
@@ -167,14 +169,13 @@ def startWebserver(session):
 	global_protocol_handler = protocol_handler
 	global_media_backend = media_backend
 	print "[AirPlayer] starting protocol hadler"
-	protocol_handler.start()												
+	protocol_handler.start()											
 	print "[AirPlayer] starting webserver done"
 	print "[AirPlayer] starting zeroconf"
 	
 	os.system("/usr/lib/enigma2/python/Plugins/Extensions/AirPlayer/zeroconfig \"" +  config.plugins.airplayer.name.value + "\" " + config.plugins.airplayer.interface.value + " &")
 	
 	print "[AirPlayer] starting zeroconf done"
-	
 
 #===============================================================================
 # sessionstart
@@ -190,6 +191,11 @@ def sessionstart(reason, session):
 # Actions to take place in autostart (startup the Webserver)
 #===============================================================================
 def networkstart(reason, **kwargs):
+	interfaces = []
+	for i in iNetwork.getAdapterList():
+		interfaces.append((i,i))
+		print "[AirPlayer] found network dev",i
+	config.plugins.airplayer.interface    = ConfigSelection(choices = interfaces)
 	if reason == 1 and config.plugins.airplayer.startuptype.value:
 		startWebserver(global_session)
 	elif reason == 0:
