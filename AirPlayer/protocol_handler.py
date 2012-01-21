@@ -62,7 +62,7 @@ class ReverseHandler(BaseHandler):
     """
 
     def render_POST(self, request):
-        print "[AirPlayer] PPeverseHandler POST"
+        #print "[AirPlayer] PPeverseHandler POST"
         
         request.setResponseCode(101)
         request.setHeader('Upgrade', 'PTTH/1.0')
@@ -96,7 +96,6 @@ class PlayHandler(BaseHandler):
             url = body['Content-Location']
             print '[AirPlayer] Playing ', url
             
-            self._media_backend.play_movie(url)
 
             if 'Start-Position' in body:
                 """ 
@@ -105,12 +104,15 @@ class PlayHandler(BaseHandler):
                 """
                 try:
                     str_pos = body['Start-Position']
+                    start = float(str_pos)
+                    #self._media_backend.set_start_position(position_percentage)
+                    print '[AirPlayer] start-position supplied: ', start , "%"
                 except ValueError:
                     print '[AirPlayer] Invalid start-position supplied: ', str_pos
-                else:        
-                    position_percentage = float(str_pos) * 100
-                    self._media_backend.set_start_position(position_percentage)
-        
+            else:
+                start = float(0)             
+            self._media_backend.play_movie(url,start)
+            
         request.setHeader('content-length', 0)
         request.finish()
         return 1 # NOT_DONE_YET
@@ -124,7 +126,7 @@ class ScrubHandler(BaseHandler):
     """       
 
     def render_GET(self, request):
-        print "[AirPlayer] ScrubHandler GET"
+        #print "[AirPlayer] ScrubHandler GET"
         """
         Will return None, None if no media is playing or an error occures.
         """
@@ -143,7 +145,7 @@ class ScrubHandler(BaseHandler):
         return 1 # NOT_DONE_YET
 
     def render_POST(self, request):
-        print "[AirPlayer] ScrubHandler POST"
+        #print "[AirPlayer] ScrubHandler POST"
         """
         Immediately finish this request, no need for the client to wait for
         backend communication.
@@ -182,7 +184,7 @@ class RateHandler(BaseHandler):
 
         if 'value' in request.args:
             play = bool(float(request.args['value'][0]))
-            print "[AirPlayer] value ",request.args['value'][0]
+            print "[AirPlayer] play? ",request.args['value'][0]
             if play:
                 self._media_backend.play()
             else:
@@ -259,7 +261,7 @@ class ServerInfoHandler(BaseHandler):
     """        
     
     def render_GET(self, request):
-        print "[AirPlayer] ServerInfoHandler GET"
+        #print "[AirPlayer] ServerInfoHandler GET"
         mac = iNetwork.getAdapterAttribute(config.plugins.airplayer.interface.value,'mac')
         if mac is None:
             mac = "01:02:03:04:05:06"
@@ -280,7 +282,7 @@ class SlideshowFeaturesHandler(BaseHandler):
     """        
 
     def render_GET(self, request):
-        print "[AirPlayer] SlideshowHandler GET"
+        #print "[AirPlayer] SlideshowHandler GET"
         """
         I think slideshow effects should be implemented by the Airplay device.
         The currently supported media backends do not support this.
@@ -297,18 +299,20 @@ class PlaybackInfoHandler(BaseHandler):
     """
     
     def render_GET(self, request):
-        print "[AirPlayer] PlaybackInfoHandler GET"
+        #print "[AirPlayer] PlaybackInfoHandler GET"
         playing = self._media_backend.is_playing()
         position, duration, bufferPosition = self._media_backend.get_player_position()
         
-        if not position:
+        if not duration and not self._media_backend.endReached:
             position = duration = 0
+            body = appletv.PLAYBACK_INFO_NOT_READY
+            #print "[AirPlayer] PlaybackInfoHandler playback not ready yet"
         else:    
             position = float(position)
             duration = float(duration)
-        print "[AirPlayer] PlaybackInfoHandler pos:",position, " duration:",duration," play:",int(playing)
+            #print "[AirPlayer] PlaybackInfoHandler pos:",position, " duration:",duration," play:",int(playing)
+            body = appletv.PLAYBACK_INFO % (duration, bufferPosition, position, int(playing), duration)
         
-        body = appletv.PLAYBACK_INFO % (duration, bufferPosition, position, int(playing), duration)
         
         request.setHeader('Content-Type', 'text/x-apple-plist+xml')
         request.setHeader('content-length', len(body))
