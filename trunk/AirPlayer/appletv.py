@@ -356,3 +356,12 @@ PLAYBACK_INFO = '<?xml version="1.0" encoding="UTF-8"?>\
 </array>\
 </dict>\
 </plist>'
+
+PLAYBACK_INFO_NOT_READY = '<?xml version="1.0" encoding="UTF-8"?>\
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\
+<plist version="1.0">\
+<dict>\
+<key>readyToPlay</key>\
+<false/>\
+</dict>\
+</plist>'

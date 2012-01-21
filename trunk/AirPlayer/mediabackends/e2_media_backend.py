@@ -17,6 +17,8 @@ from base_media_backend import BaseMediaBackend
 from Components.config import config
 from Components.ServiceEventTracker import ServiceEventTracker
 from enigma import iPlayableService
+from thread import start_new_thread
+from time import sleep
 
 class E2MediaBackend(BaseMediaBackend):
 
@@ -29,31 +31,37 @@ class E2MediaBackend(BaseMediaBackend):
         self.bufferSeconds = 0
         self.bufferPercent = 0
         self.bufferSecondsLeft = 0
+        self.endReached = False
+        self.duration = 0.0
+        self.playPosition = 0.0
+        
         self.__event_tracker = ServiceEventTracker(screen=self,eventmap=
             {
                 iPlayableService.evBuffering: self.__evUpdatedBufferInfo,
                 
             })
     def __evUpdatedBufferInfo(self):
-        bufferInfo = self.session.nav.getCurrentService().streamed().getBufferCharge()
-        if bufferInfo[2] != 0:
-            self.bufferSeconds = bufferInfo[4] / bufferInfo[2] #buffer size / avgOutRate
-        else:
-            self.bufferSeconds = 0
-        self.bufferPercent = bufferInfo[0]
-        self.bufferSecondsLeft = self.bufferSeconds * self.bufferPercent / 100
-        if(self.bufferPercent > 90):
-            if self.window is not None:
-                self.window.bufferFull()
-        if(self.bufferPercent < 3):
-            if self.window is not None:
-                self.window.bufferEmpty()
-        print "Buffer",bufferInfo[4], "Info ",bufferInfo[0], "% filled ",bufferInfo[1],"/",bufferInfo[2]," buffered: ",self.bufferSecondsLeft, "s"
-        #print "percent ",bufferInfo[0]
-        #print "avgInRate ",bufferInfo[1]
-        #print "avgOutRate ",bufferInfo[2]
-        #print "buffering left ",bufferInfo[3]
-        #print "buffer size ",bufferInfo[4]
+        if self.window is not None:
+            bufferInfo = self.session.nav.getCurrentService().streamed().getBufferCharge()
+            if bufferInfo[2] != 0:
+                self.bufferSeconds = bufferInfo[4] / bufferInfo[2] #buffer size / avgOutRate
+            else:
+                self.bufferSeconds = 0
+            self.bufferPercent = bufferInfo[0]
+            self.bufferSecondsLeft = self.bufferSeconds * self.bufferPercent / 100
+            if(self.bufferPercent > 90):
+                if self.window is not None:
+                    self.window.bufferFull()
+                    
+            if(self.bufferPercent < 3 and not self.endReached ):
+                if self.window is not None:
+                    self.window.bufferEmpty()
+            #print "Buffer",bufferInfo[4], "Info ",bufferInfo[0], "% filled ",bufferInfo[1],"/",bufferInfo[2]," buffered: ",self.bufferSecondsLeft, "s"
+            #print "percent ",bufferInfo[0]
+            #print "avgInRate ",bufferInfo[1]
+            #print "avgOutRate ",bufferInfo[2]
+            #print "buffering left ",bufferInfo[3]
+            #print "buffer size ",bufferInfo[4]
     
     def cleanup(self):
         """
@@ -88,7 +96,7 @@ class E2MediaBackend(BaseMediaBackend):
             self.session.open(AirPlayPicturePlayer, self, config.plugins.airplayer.path.value + "pic.jpg")
         pass
         
-    def play_movie(self, url):
+    def play_movie(self, url, start=None):
         """
         Play a movie from the given location.
         @param url the address of the media file to add
@@ -100,7 +108,10 @@ class E2MediaBackend(BaseMediaBackend):
         sref.setName("AirPlay")
         self.sref = sref
         #self.session.openWithCallback(self.MoviePlayerCallback, AirPlayMoviePlayer, sref, self)
-        self.session.open(AirPlayMoviePlayer, sref, self)
+        self.endReached = False
+        self.duration = 0.0
+        self.playPosition = 0.0
+        self.session.open(AirPlayMoviePlayer, sref, self, start)
 
     def notify_started(self):
         """
@@ -135,7 +146,7 @@ class E2MediaBackend(BaseMediaBackend):
         Get the current videoplayer position.
         @returns int current position, int total length
         """
-        print '[AirPlayer] get_play_posoition'
+        #print '[AirPlayer] get_play_posoition'
         time = 0
         length = 0
         service = self.session.nav.getCurrentService()
@@ -143,12 +154,22 @@ class E2MediaBackend(BaseMediaBackend):
         if seek != None:
             r = seek.getLength()
             if not r[0]:
-                length = r[1] / 90000
+                length = float(float(r[1]) / float(90000))
             r = seek.getPlayPosition()
             if not r[0]:
-                time = r[1] / 90000
+                time = float(float(r[1]) / float(90000))
+        
+        if time > 0 and length > 0:
+            self.playPosition = time
+            self.duration = length
+        
+            if time >= (length-2.5):
+                print "near end of file"
+                self.endReached = True
+        else: # either the beginning of the file or the end of the file in both cases the values should be the same
+            self.playPosition = self.duration
             
-        return time, length, time + self.bufferSecondsLeft
+        return self.playPosition, self.duration, self.playPosition + self.bufferSecondsLeft
         
 
     def set_player_position(self, position):
@@ -160,8 +181,8 @@ class E2MediaBackend(BaseMediaBackend):
         time, length ,buffer = self.get_player_position()
         print '[AirPlayer] set_player_position: to:', position, " from:",time, " diff:",position - time
         if self.window is not None:
-            self.window.unPauseService()
-            self.window.doSeekRelative( int((position - time) * 90000) )
+            #self.window.unPauseService()
+            self.window.doSeek( int((position ) * 90000) )
             
     def is_playing(self):
         if self.window is not None:
@@ -185,13 +206,49 @@ class E2MediaBackend(BaseMediaBackend):
 
 
 class AirPlayMoviePlayer(MoviePlayer):
-    def __init__(self, session, service, backend):
+    def __init__(self, session, service, backend, start=None):
         MoviePlayer.__init__(self, session, service)
         self.backend = backend
         backend.window=self
         session.nav.getCurrentService().streamed().setBufferSize(config.plugins.airplayer.bufferSize.value)
         self.AutoPlay = True
-        #self.skinName = "MoviePlayer"
+        self.start=start;
+        start_new_thread(self.seekWatcher,(self,))
+        
+    def seekWatcher(self,*args):
+        print "[AirPlayer] seekWatcher started"
+        while self.start is not None:
+              self.seekToStartPos()
+              sleep(0.2)
+        print "[AirPlayer] seekWatcher finished"     
+        
+    def seekToStartPos(self):
+        time = 0
+        if self.start is not None:
+            service = self.session.nav.getCurrentService()
+            seek = service and service.seek()
+            if seek != None:
+                r = seek.getLength()
+                if not r[0]:
+                    print "[AirPlayer] got duration"
+                    if r[1] == 0:
+                        print "[AirPlayer] duration 0"
+                        return
+                    length = r[1]
+                    r = seek.getPlayPosition()
+                    if not r[0]:
+                        print "playbacktime ",r[1]
+                        if r[1] < 20000:# ~0,2sekunden
+                            print "do not seek yet",r[1]
+                            return
+                    else:
+                        return
+                    
+                    time = length * self.start
+                    print "[AirPlayer] seeking to", time, " length ",length,""
+                    self.session.nav.getCurrentService().streamed().setBufferSize(config.plugins.airplayer.bufferSize.value)
+                    self.doSeek(int(time))
+                    self.start = None
 
     def bufferFull(self):
         if self.AutoPlay:
