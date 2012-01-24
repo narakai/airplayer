@@ -1,7 +1,5 @@
+#summary is the changelog of the development.
 #labels Changelog,Enigma2,AirPlayer
-#This is the changelog of the development.
-
-= Changelog =
 == 0.1.6 ==
  * Bilder von Android mit Doubletwist und Airsync können nun angezeigt werden
  * neue Option zum verwenden eines QuickTime userAgents (nötig z.B. für AppleTrailer)
