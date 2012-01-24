@@ -1,0 +1,32 @@
+#labels Changelog,Enigma2,AirPlayer
+=Changelog=
+==0.1.6==
+ * Bilder von Android mit Doubletwist und Airsync können nun angezeigt werden
+ * neue Option zum verwenden eines QuickTime userAgents (nötig z.B. für AppleTrailer)
+ * Verarbeitung von QuickTime weiterleitungen. (Apple Trailer in SD oder z.B. die Special events von der Apple seite schickt ein link zu einer mov datei, die aber nur ein paar bytes enthält. in der datei sind die richtigen links zum streamen der videos! GStreamer kann damit aber nicht umgehen. Daher werden diese Dateien nun vom plugin gelesen und ausgewertet sofern der link mov enthält und die datei unter 10kb ist. Von meinem iPad gehen nun die Apple Trailer und special events von der Aplle Seite)
+
+==0.1.5b==
+ * fehler beim starten behoben bei falscher typenkonvertierung
+
+==0.1.5==
+ * vom iPhone/iPad übermittelte Startposition auswerten und setzen (durch das springen beim starten wurden bei mir die probleme mit dem ruckeln am anfang wesentlich besser)
+ * beenden von alten zeroconfig instanzen vor dem straten einer neuen
+ * deaktivierung einiger debug ausgaben
+
+==0.1.4==
+ * die Liste mit den Netzwerk devices in den Settings wird jetzt automatisch mit den vorhandenen Interfaces bestückt! (Behebt hoffentlich das Problem mit den verschiedenen Namen der WLAN geräte)
+ * Neue Option zum einstellen des Buffers für gstreamer. Das verbessert hoffentlich an einigen Stellen Probleme mit ruckeln. Der Buffer hatte vorher 1MB, default ist jetzt 8MB, Maximale Größe ist mir nicht bekannt, möglicherweise führt ein zu großer Wert zu Fehlern.
+ * Buffer Control: Beim starten eines Videos sollte das Video automatisch auf Pause springen, bis der Buffer ca 90% gefüllt ist, dann beginnt automatisch das Abspielen. Fällt der buffer auf unter 3% Füllstatus wird wieder pausiert und gewartet bis der Buffer wieder ca 90% gefüllt wurde. Das ganze kann per fernbedienung der Box übersteuert werden
+
+==0.1.3:==
+ * cleanups
+ * kleine änderungen an zeroconfig hoffentlich geht damit auch wlan
+
+==0.1.2:==
+ * bugfixing
+
+==0.1.1:==
+ * GUI hinzugefügt
+
+==0.1.0:==
+ * Erstes Release
