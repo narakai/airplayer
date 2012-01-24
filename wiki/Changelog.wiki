@@ -1,4 +1,4 @@
-#summary is the changelog of the development.
+#summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
 == 0.1.6 ==
  * Bilder von Android mit Doubletwist und Airsync können nun angezeigt werden
