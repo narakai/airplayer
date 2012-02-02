@@ -1,11 +1,11 @@
 ==!AirPlayer in Version 0.1.7 Demo Youtube==
-[http://www.youtube.com/watch?v=BZ8Lk7Qj9lw Direktlink]
+[http://www.youtube.com/watch?v=BZ8Lk7Qj9lw Direktlink]<br />
 <wiki:video url="http://www.youtube.com/watch?v=BZ8Lk7Qj9lw"/>
 
 ==!AirPlayer in Version 0.1.7 Demo Fotos, Videos, myVideo==
-[http://www.youtube.com/watch?v=4BiLdqZ2FUU Direktlink]
+[http://www.youtube.com/watch?v=4BiLdqZ2FUU Direktlink]<br />
 <wiki:video url="http://www.youtube.com/watch?v=4BiLdqZ2FUU"/>
 
 ==!AirPlayer in Version 0.1.0 Demo Fotos Videos und Youtube==
-[http://www.youtube.com/watch?v=1Ra7KeZWJlk Direktlink]
+[http://www.youtube.com/watch?v=1Ra7KeZWJlk Direktlink]<br />
 <wiki:video url="http://www.youtube.com/watch?v=1Ra7KeZWJlk"/>
