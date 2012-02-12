@@ -1,5 +1,11 @@
 #summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
+== 0.1.7 ==
+ * InfoBar zum MoviePlayer hinzuegefügt mit Anzeige des Bufferfüllstandes
+ * Update check hinzugefügt. Prüft automatisch ob Updates verfügbar sind. Diese Updates können direkt über das Plugin geladen und ausgeführt werden. Ein changelog wird ebenfalls vor dem Update angezeigt.
+ * BufferControl für vu+ boxen deaktiviert
+ * kleinere verbesserungen im playback handling
+
 == 0.1.6 ==
  * Bilder von Android mit Doubletwist und Airsync können nun angezeigt werden
  * neue Option zum verwenden eines QuickTime userAgents (nötig z.B. für AppleTrailer)
