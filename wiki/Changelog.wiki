@@ -1,5 +1,10 @@
 #summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
+== 0.1.8 ==
+ * hoffentlich den bug mit dem MediaPlayer beseitigt
+ * Update Prozess verbesser
+ * kleinere bugfixe
+
 == 0.1.7 ==
  * [InfoBar] zum [MoviePlayer] hinzuegefügt mit Anzeige des Bufferfüllstandes
  * Update check hinzugefügt. Prüft automatisch ob Updates verfügbar sind. Diese Updates können direkt über das Plugin geladen und ausgeführt werden. Ein changelog wird ebenfalls vor dem Update angezeigt.
