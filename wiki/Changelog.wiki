@@ -4,7 +4,7 @@
  * Lokaler cache für langsame Internetverbindungen hinzugefügt
    Wenn ein Stream ruckelt, einfach die RECORD taste drücken. Der Download startet und der Downloadfortschritt ist in der InfoBar zu sehen.
    Forstsetzen des Playbacks über die PLAY taste. 
- * Fehlerbehandling verbessert
+ * Fehlerbehandlung verbessert
 
 == 0.1.8 ==
  * hoffentlich den bug mit dem MediaPlayer beseitigt
