@@ -1,5 +1,15 @@
 #summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
+== 0.2.0 ==
+ * AitTunes Audio-Streaming hinzugefügt
+ * Playback-Status wird an das iOS Device zurückgemeldet
+ * TV-Bild kann bei der Wiedergabe von Fotos gestoppt werden
+ * Blockieren von Frontends durch zeroconfig behoben
+ * Fehlerbehebung
+
+== 0.1.10 ==
+ * bug in der Fehlerbehandlung beseitigt.
+
 == 0.1.9 ==
  * Lokaler cache für langsame Internetverbindungen hinzugefügt
    Wenn ein Stream ruckelt, einfach die RECORD taste drücken. Der Download startet und der Downloadfortschritt ist in der InfoBar zu sehen.
