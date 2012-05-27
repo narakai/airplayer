@@ -1,7 +1,12 @@
 #summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
+== 0.2.1 ==
+ * Setzen der Downmix Option für Audio-Streaming
+ * Fehler beim Starten/Stoppen behoben
+ * Verwenden der Architekturinformationen für das Auto-Update
+
 == 0.2.0 ==
- * AitTunes Audio-Streaming hinzugefügt
+ * AirTunes Audio-Streaming hinzugefügt
  * Playback-Status wird an das iOS Device zurückgemeldet
  * TV-Bild kann bei der Wiedergabe von Fotos gestoppt werden
  * Blockieren von Frontends durch zeroconfig behoben
