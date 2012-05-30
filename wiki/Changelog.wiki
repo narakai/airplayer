@@ -1,5 +1,8 @@
 #summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
+== 0.2.3 ==
+ * Fehlerbehebung für das Audio-Streaming unter oe1.6 auf Dreamboxen
+
 == 0.2.1 ==
  * Setzen der Downmix Option für Audio-Streaming
  * Fehler beim Starten/Stoppen behoben
