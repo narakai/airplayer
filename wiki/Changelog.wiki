@@ -1,6 +1,14 @@
 #summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
+== 0.2.4 ==
+ * Fehlerbehebung
+
 == 0.2.3 ==
+ * Verbesserungen für Aduio-Streaming unter oe1.6
+ * Steuern der Alutstärke beim Audio-Streaming über das iOS Device
+ * Verbesserungen der Stabilität
+
+== 0.2.2 ==
  * Fehlerbehebung für das Audio-Streaming unter oe1.6 auf Dreamboxen
 
 == 0.2.1 ==
