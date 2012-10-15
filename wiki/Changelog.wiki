@@ -1,5 +1,14 @@
 #summary Entwicklungsfortschritte
 #labels Changelog,Enigma2,AirPlayer
+== 0.3.1 ==
+ * AzBox fixes
+ * Bildschirmschoner bei Audio-Streaming
+ * Box kann bei Audio-Streaming aus dem StandBy aufgeweckt werden
+ * neuer Lokaler Proxy (Premium-Feature) Videos werden lokal zwischengespeichert, dies verbessert die Wiedergabe und ermöglicht auch die Wiedergabe von m3u8-Streams (MyVideo, ZDF, AirVideo etc).
+ * Überarbeitetes update Konzept
+ * Verbesserung der Stabilität
+ * Fehlerbehebungen
+
 == 0.2.4 ==
  * Fehlerbehebung
 
